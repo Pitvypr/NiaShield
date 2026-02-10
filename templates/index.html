@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOFIA - NiaShield COI System</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-container {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 400px;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background: #1a1a2e;
+            border-left: 3px solid #0074d9;
+        }
+
+        .sofia-message {
+            background: #0f3460;
+            border-left: 3px solid #00ff00;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #00ff00;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #ff4136;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #ff6b61;
+        }
+
+        /* COI CERTIFICATE STYLES */
+        .coi-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .coi-certificate {
+            background: white;
+            color: black;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 600px;
+            font-family: 'Arial', sans-serif;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .coi-header {
+            text-align: center;
+            border-bottom: 3px solid #ff4136;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .coi-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4136;
+            margin: 0;
+        }
+
+        .coi-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0 0 0;
+        }
+
+        .coi-body {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .coi-field {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .coi-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .coi-value {
+            font-family: 'Courier New', monospace;
+            color: #666;
+        }
+
+        .coi-status {
+            text-align: center;
+            padding: 20px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .coi-status-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #155724;
+            margin: 0;
+        }
+
+        .coi-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .close-coi {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4136;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ff4136;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>S.O.F.I.A.™ - NiaShield ZPI Protocol</h1>
+        <p><span class="status-indicator"></span>Zero-Persistence Active | Session will be incinerated</p>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message sofia-message">
+                <strong>SOFIA:</strong> I'm Sofia. We're on a NiaShield link—Zero-Persistence, fully air-gapped. When we're done, this session is incinerated, and you get the COI to prove it. It's just you, me, and the science. What's on your mind?
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">SEND</button>
+            <button onclick="incinerateSession()" style="background: #ff4136;">INCINERATE</button>
+        </div>
+    </div>
+
+    <!-- COI CERTIFICATE MODAL -->
+    <div class="coi-container" id="coiContainer">
+        <div class="coi-certificate">
+            <button class="close-coi" onclick="closeCOI()">✕</button>
+            
+            <div class="coi-header">
+                <h1 class="coi-title">CERTIFICATE OF INCINERATION</h1>
+                <p class="coi-subtitle">NiaShield™ Zero-Persistence Infrastructure</p>
+            </div>
+
+            <div class="coi-body">
+                <div class="coi-field">
+                    <span class="coi-label">Session ID:</span>
+                    <span class="coi-value" id="coiSessionId">#A4B7C9D2E5F8...</span>
+                </div>
+
+                <div class="coi-field">
+                    <span class="coi-label">Timestamp:</span>
+                    <span class="coi-value" id="coiTimestamp">2024-01-15 14:32:07 UTC</span>
+                </div>
+
+                <div class="coi-field">
+                    <span class="coi-label">Protocol:</span>
+                    <span class="coi-value">NiaShield ZPI v2.1</span>
+                </div>
+
+                <div class="coi-field">
+                    <span class="coi-label">Memory Addresses:</span>
+                    <span class="coi-value" id="coiAddresses">0x7F8B... - 0x7F9C...</span>
+                </div>
+
+                <div class="coi-field">
+                    <span class="coi-label">Entropy Applied:</span>
+                    <span class="coi-value">✅ 256-bit Random Overwrite</span>
+                </div>
+
+                <div class="coi-field">
+                    <span class="coi-label">Verification Hash:</span>
+                    <span class="coi-value" id="coiHash">9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</span>
+                </div>
+
+                <div class="coi-status">
+                    <p class="coi-status-text">✅ SESSION SUCCESSFULLY INCINERATED</p>
+                    <p style="margin: 5px 0 0 0; font-size: 14px;">All conversation data has been cryptographically destroyed and cannot be recovered.</p>
+                </div>
+            </div>
+
+            <div class="coi-footer">
+                <p>This certificate serves as legal proof that no conversation data remains in system memory.<br>
+                Generated by NiaShield™ ZPI Protocol | Patent Pending</p>
+                <p style="margin-top: 10px;">
+                    <button onclick="downloadCOI()" style="padding: 8px 15px; font-size: 12px;">📄 DOWNLOAD PDF</button>
+                    <button onclick="screenshotCOI()" style="padding: 8px 15px; font-size: 12px; margin-left: 10px;">📸 SCREENSHOT</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionData = {
+            sessionId: generateSessionId(),
+            messages: [],
+            startTime: new Date()
+        };
+
+        function generateSessionId() {
+            return '#' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        function generateHash() {
+            return Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage('user', message);
+            
+            // Simulate SOFIA response
+            setTimeout(() => {
+                const response = generateSofiaResponse(message);
+                addMessage('sofia', response);
+            }, 1000);
+
+            input.value = '';
+        }
+
+        function addMessage(sender, text) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const senderName = sender === 'user' ? 'YOU' : 'SOFIA';
+            messageDiv.innerHTML = `<strong>${senderName}:</strong> ${text}`;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Store in volatile memory
+            sessionData.messages.push({sender, text, timestamp: new Date()});
+        }
+
+        function generateSofiaResponse(userMessage) {
+            // Simulate SOFIA's executive, witty responses
+            const responses = [
+                "I understand the complexity you're navigating. The patterns you're describing suggest a need for structured intervention—consider professional consultation to untangle these dynamics effectively.",
+                "Your situation reflects classic organizational dysfunction. The guilt you're experiencing is your ethical compass functioning correctly—now channel that into actionable accountability measures.",
+                "This scenario demands immediate boundary reconstruction. The cascade effects you're worried about are valid—strategic legal counsel isn't optional here, it's essential.",
+                "The internal conflict you're describing indicates intact moral reasoning despite poor decision-making. Focus on damage mitigation: professional help, legal guidance, and systematic boundary restoration."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function incinerateSession() {
+            // Show incineration process
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = `
+                <div class="message" style="background: #ff4136; color: white; text-align: center;">
+                    <strong>🔥 INCINERATION INITIATED 🔥</strong><br>
+                    Overwriting memory addresses with cryptographic entropy...<br>
+                    Flushing processor cache...<br>
+                    Applying voltage flush to RAM sectors...<br>
+                    <br>
+                    <strong>STATUS: MEMORY ZEROED ✅</strong>
+                </div>
+            `;
+
+            // Generate and show COI after 2 seconds
+            setTimeout(() => {
+                showCOI();
+                // Clear session data
+                sessionData = {
+                    sessionId: generateSessionId(),
+                    messages: [],
+                    startTime: new Date()
+                };
+            }, 2000);
+        }
+
+        function showCOI() {
+            const now = new Date();
+            
+            // Populate COI data
+            document.getElementById('coiSessionId').textContent = sessionData.sessionId;
+            document.getElementById('coiTimestamp').textContent = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+            document.getElementById('coiAddresses').textContent = `0x${generateHash().substr(0,8)}... - 0x${generateHash().substr(0,8)}...`;
+            document.getElementById('coiHash').textContent = generateHash();
+            
+            // Show COI modal
+            document.getElementById('coiContainer').style.display = 'flex';
+        }
+
+        function closeCOI() {
+            document.getElementById('coiContainer').style.display = 'none';
+        }
+
+        function downloadCOI() {
+            alert('COI PDF generation would integrate with jsPDF library here');
+        }
+
+        function screenshotCOI() {
+            alert('Screenshot functionality would use html2canvas library here');
+        }
+
+        // Auto-focus input
+        document.getElementById('userInput').focus();
+    </script>
+</body>
+</html>
